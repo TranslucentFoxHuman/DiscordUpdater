@@ -12,7 +12,7 @@ fi
 
 CHKOUT=`discordupdater -c`
 
-if [[ "$CHKOUT" != *"Update available!"* ]];then
+if [[ "$CHKOUT" != *"Update available!"* && "$CHKOUT" != *"Discord is not installed"* ]];then
     exit
 fi
 
