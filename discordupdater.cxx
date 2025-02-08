@@ -135,11 +135,11 @@ int download_package() {
 	curl_easy_setopt(handle, CURLOPT_URL, getdownloadurl().c_str());
 	curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, save_data);
 	curl_easy_setopt(handle, CURLOPT_WRITEDATA, file);
-
-	std::cout << std::defaultfloat << std::endl;
-
 	result = curl_easy_perform(handle);
 	fclose(file);
+	
+	std::cout << std::defaultfloat << std::endl;
+	
 	return int(result);
 }
 
