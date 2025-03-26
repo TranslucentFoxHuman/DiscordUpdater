@@ -1,4 +1,4 @@
-#define _VERSION_CODE_ "1.0.3.2"
+#define _VERSION_CODE_ "1.1.2"
 
 /*
  * discordupdater
@@ -229,6 +229,7 @@ void print_help(std::string progname) {
 				 "-D <diractory> : Specify the download diractory.(default:/tmp)\n"
 				 "-n             : Do not remove package file after installation.\n"
 				 "-o <filename>  : Specify the download filename.(default is the original filename)\n"
+                 "-r             : Reinstall Discord.\n"
 				 "-u             : Download Discord .deb package and install it.\n"
 				 "-y             : Do not ask any questions\n"
 				 "-h             : Print this help.\n"
@@ -303,76 +304,121 @@ int main (int argc,char **argv) {
 				exit (10);
 			}
 			commandmode = 3;
-		} else {
+        } else if ("-r" == std::string(argv[i])) {
+            if (commandmode != 0) {
+                std::cerr << "Error! : Multiple comannd were specified." << std::endl;
+                exit (10);
+            }
+            commandmode = 4;
+        } else {
 			std::cout << "Unknown options: \"" + std::string(argv[i]) + "\"\n"
 						 "Note: To reduce development effort, this program does not recognize combined options. Please describe the options separataly." << std::endl;
 			return 1;
 		}
 
-	}
-	switch(commandmode) {
-		int res2;
-		case 1:
-			command_c();
-		break;
-		case 2:
-			res2 = download_package();
-			if (res2 != 0) {
-				if (res2 == 255) {
-					std::cerr << "Could not open the output file: " + dlfolder + "/" + dlname << std::endl;
-					exit (3);
-				} else {
-					std::cerr << "libcurl returned error with code: " + std::to_string(res2);
-					exit(res2);
-				}
-			}
-		break;
-		case 3:
-			std::string vers = checkupdate();
-			if (vers.find("error") !=std::string::npos) {
-				std::cerr << "An error has occurred: " << vers << std::endl;
-				exit(2);
-			}
-			int spos = vers.find("uptodate:");
-			if (spos != std::string::npos)  {
-				spos += std::string("uptodate:").length();
-				std::cout << "Discord is already up-to-date!\nCurrent version:" + vers.substr(spos) << std::endl;
-				return 0;
-			}
-			if (!yesman) {
-				std::cout << "Update available:" + vers + "\nDo you want to install it?(Y/n): ";
-				std::string yon;
-				std::cin >> yon;
-				if (yon == "n" || yon == "N") {
-					exit(0);
-				}
-			} else {
-				std::cout << "Update available:" + vers << std::endl;
-			}
-			int res = download_package();
-			if (res != 0) {
-				if (res == 255) {
-					std::cerr << "Could not open the output file: " + dlfolder + "/" + dlname << std::endl;
-					exit (3);
-				} else {
-					std::cerr << "libcurl returned error with code: " + std::to_string(res);
-					exit(res);
-				}
-			}
-			res = do_upgrade();
-			if (!donotoremove) {
-				int bres = remove(std::string(dlfolder + "/" + dlname).c_str());
-				if (bres != 0) {
-					std::cerr << "Could not remove package file. Package file is " + dlfolder + "/" + dlname +" . Please remove it manually." << std::endl;
-				}
-			}
-			if (res != 0) {
-				std::cerr << "Installation may failed! apt returned the code: " + std::to_string(res) << std::endl;
-				exit(res);
-			}
-		break;
+    }
 
-	}
+    /* Commands:
+     * 1: command_c() - check update.
+     * 2: Download Package.
+     * 3: Check updates and install.
+     * 4: Reinstall Discord.
+     */
+
+    { // Command switch
+        std::string vers = "";
+        int res;
+        int res2;
+        int spos;
+
+        switch(commandmode) {
+            case 1:
+                command_c();
+            break;
+            case 2:
+                res2 = download_package();
+                if (res2 != 0) {
+                    if (res2 == 255) {
+                        std::cerr << "Could not open the output file: " + dlfolder + "/" + dlname << std::endl;
+                        exit (3);
+                    } else {
+                        std::cerr << "libcurl returned error with code: " + std::to_string(res2);
+                        exit(res2);
+                    }
+                }
+            break;
+            case 3:
+                vers = checkupdate();
+                if (vers.find("error") !=std::string::npos) {
+                    std::cerr << "An error has occurred: " << vers << std::endl;
+                    exit(2);
+                }
+                spos = vers.find("uptodate:");
+                if (spos != std::string::npos)  {
+                    spos += std::string("uptodate:").length();
+                    std::cout << "Discord is already up-to-date!\nCurrent version:" + vers.substr(spos) << std::endl;
+                    return 0;
+                }
+                if (!yesman) {
+                    std::cout << "Update available:" + vers + "\nDo you want to install it?(Y/n): ";
+                    std::string yon;
+                    std::cin >> yon;
+                    if (yon == "n" || yon == "N") {
+                        exit(0);
+                    }
+                } else {
+                    std::cout << "Update available:" + vers << std::endl;
+                }
+                res = download_package();
+                if (res != 0) {
+                    if (res == 255) {
+                        std::cerr << "Could not open the output file: " + dlfolder + "/" + dlname << std::endl;
+                        exit (3);
+                    } else {
+                        std::cerr << "libcurl returned error with code: " + std::to_string(res);
+                        exit(res);
+                    }
+                }
+                res = do_upgrade();
+                if (!donotoremove) {
+                    int bres = remove(std::string(dlfolder + "/" + dlname).c_str());
+                    if (bres != 0) {
+                        std::cerr << "Could not remove package file. Package file is " + dlfolder + "/" + dlname +" . Please remove it manually." << std::endl;
+                    }
+                }
+                if (res != 0) {
+                    std::cerr << "Installation may failed! apt returned the code: " + std::to_string(res) << std::endl;
+                    exit(res);
+                }
+            break;
+            case 4:
+                if (aptinstall == "sudo apt install -y \"%s\"") {
+                    aptinstall = "sudo apt reinstall -y \"%s\"";
+                }
+                res = download_package();
+                if (res != 0) {
+                    if (res == 255) {
+                        std::cerr << "Could not open the output file: " + dlfolder + "/" + dlname << std::endl;
+                        exit (3);
+                    } else {
+                        std::cerr << "libcurl returned error with code: " + std::to_string(res);
+                        exit(res);
+                    }
+                }
+                res = do_upgrade();
+                if (!donotoremove) {
+                    int bres = remove(std::string(dlfolder + "/" + dlname).c_str());
+                    if (bres != 0) {
+                        std::cerr << "Could not remove package file. Package file is " + dlfolder + "/" + dlname +" . Please remove it manually." << std::endl;
+                    }
+                }
+                if (res != 0) {
+                    std::cerr << "Installation may failed! apt returned the code: " + std::to_string(res) << std::endl;
+                    exit(res);
+                }
+            break;
+        }
+    }
 
 
 
