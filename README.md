@@ -33,5 +33,30 @@ Or:
 clang++ discordupdater.cxx -o discordupdater -lcurl
 ```
 
+## Usage
+### Basic Example
+```
+discordupdater -u                #Install or update Discord.
+discordupdater -c                #Check Updates.
+discordupdater -d -D /home/user/ #Download package to /home/user. (Not install)
+```
+### Command line options
+Command line options cannot be specified in a combined form (invalid example: -nuy).   
+Each option must be entered separately (correct example: -n -u -y).   
+Why is that? To reduce development effort :)
+
+```
+-c             : Only check updates for Discord and do not install
+-C <cmdline>   : Specify the installation command line. "%s" will replaced to package name.(default: sudo apt install -y %s)
+-d             : Only download discord.
+-D <diractory> : Specify the download diractory.(default:/tmp)
+-n             : Do not remove package file after installation.
+-o <filename>  : Specify the download filename.(default is the original filename)
+-r             : Reinstall Discord.
+-u             : Download Discord .deb package and install it.
+-y             : Do not ask any questions.
+-h             : Print help.
+-v             : Print version information.
+```
 ## License
 See the COPYING file
