@@ -18,7 +18,7 @@ By registering this as a startup program in your desktop environment, you can ch
 - README.md          : This file
 
 ## How to build
-You can compile using g++ or clang++. Additionally, the libcurl development package is required. On many Debian-based GNU/Linux systems, you can install it with the following command:
+You can compile using g++ or clang++. Additionally, the libcurl development package is required. On most Debian-based GNU/Linux systems, you can install it with the following command:
 ```
 sudo apt install libcurl4-openssl-dev
 ```
@@ -58,5 +58,19 @@ Why is that? To reduce development effort :)
 -h             : Print help.
 -v             : Print version information.
 ```
+## updater.sh
+This file is a shell script that, when executed, checks for Discord updates and displays a dialog asking whether to install the updates if they are available. Clicking "Yes" will launch the main program in a default terminal emulator, and the installation will be executed.  
+   
+This script requires Zenity. On most Debian-based GNU/Linux systems, you can install it with the following command:
+```
+sudo apt install zenity
+```
+The main program is named "discordupdater" and needs to be placed in a directory that is included in the PATH (for example, /usr/local/bin).   
+Alternatively, you can also modify the shell script itself.
+  
+  
+This script was developed with the expectation that it will be executed at the startup of your desktop environment. Register this script in the auto-start settings of your desktop environment. By doing so, it should check for Discord updates upon login and display a dialog asking whether to update.
+Alternatively, you can create a desktop entry to execute this script, allowing you to check for updates with a single click. How you choose to use this is entirely up to you.
+
 ## License
 See the COPYING file
