@@ -1,6 +1,8 @@
 # DiscordUpdaterKit
 Copyright (C) 2025 半透明狐人間 (半狐,TranslucentFoxHuman,TlFoxHuman)
 
+Note: Most of this document is machine-translated. Please let me know if there are any mistakes!
+
 ## What is this?
 This project was created to simplify and automate the installation and updating of Discord on Debian-based GNU/Linux operating systems.  
 This command checks for Discord updates, downloads the packages, and performs the upgrade all in one go.
